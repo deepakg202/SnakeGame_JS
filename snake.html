@@ -1,0 +1,267 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Snake</title>
+	   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  </head>
+  <body class="text-center">
+
+      <h1>Snake</h1>    
+
+	<div id="scores" class="d-flex flex-row text-white justify-content-between container" style="width: 300px;">
+		<div class="bg-dark p-2 w-40">Level<div id="level" class="w-100"></div></div>
+		<div class="bg-dark p-2 w-40">Score<div id="score" class="w-100"></div></div>
+	</div>
+	
+	<div class="d-flex flex-row justify-content-center m-3 container">
+		<div>Delay: <input class="w-10 m-3" value="140" id="delay" type="number"></div>
+		<div>Board Size: <input class="w-10 m-3" value="300" id="board" type="number"></div>
+		<div>Pixel Size: <input class="w-10 m-3" value="10" id="pixel" type="number"></div>
+		<input type="button" value="Generate" id="make">
+	</div>
+	
+	
+	<canvas id="gameCanvas"><canvas>
+
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	
+	<script>
+	
+	function snakeAPI(delay, pixel, board){
+		function createDot(pos_x, pos_y, color)
+		{
+			c.fillStyle = color;
+			c.fillRect(pos_x * DOT_SIZE, pos_y * DOT_SIZE, DOT_SIZE, DOT_SIZE);
+		}
+		
+		function fixed_fruitey(pos_x, pos_y)
+		{
+			createDot(pos_x, pos_y, "#0FF000");
+		}
+		
+		function got_Fruit(pos_x, pos_y, dots)
+		{
+			for(var z = 0; z < dots; z++) 
+				if (x[z] == pos_x && y[z] == pos_y) {
+					return true;
+				}
+			return false;
+		}
+		
+		var fruit_x;
+		var fruit_y;
+		
+		function new_fruit(dots)
+		{
+			fruit_x = Math.floor(Math.random() * (MAX_RAND + 1));
+			fruit_y = Math.floor(Math.random() * (MAX_RAND + 1));
+			for(var z=0; z<dots;z++)
+			{
+				if(x[z]==fruit_x && y[z]==fruit_y)
+				{
+					new_fruit();
+				}
+			}
+		}
+		
+		
+		function snakey(dots)
+		{
+			for(var z = 0; z < dots; z++) {
+				if (z == 0) {
+					createDot(x[z], y[z], "#FF0000");
+				} else {
+					createDot(x[z], y[z], "#000000");
+				}
+			}    
+		}
+		
+		
+		function controls(dots)
+		{
+			
+			for (var z = dots; z > 0; z--) {
+				x[z] = x[(z - 1)];
+				y[z] = y[(z - 1)];
+			}
+			
+			onkeydown = function(e) {
+		
+				var key = e.keyCode;
+				
+				if ((key == LEFT_KEY) && (!rightDirection)) {
+					
+					leftDirection = true;
+					upDirection = false;
+					downDirection = false;
+				}
+
+				else if ((key == RIGHT_KEY) && (!leftDirection)) {
+					
+					rightDirection = true;
+					upDirection = false;
+					downDirection = false;
+				}
+
+				else if ((key == UP_KEY) && (!downDirection)) {
+					
+					upDirection = true;
+					rightDirection = false;
+					leftDirection = false;
+				}
+
+				else if ((key == DOWN_KEY) && (!upDirection)) {
+					
+					downDirection = true;
+					rightDirection = false;
+					leftDirection = false;
+				}        
+			};   
+		
+		
+		
+			
+			if (leftDirection) {
+			
+				x[0] -= 1;
+			}
+
+			if (rightDirection) {
+			
+				x[0] += 1;
+			}
+
+			if (upDirection) {
+			
+				y[0] -= 1;
+			}
+
+			if (downDirection) {
+			
+				y[0] += 1;
+			}
+		}
+		
+		
+		function checkCollision(dots) {
+
+			for (var z = dots; z > 0; z--) {
+
+				if ((x[0] == x[z]) && (y[0] == y[z])) {
+					return true;
+				}
+			}
+
+			if (y[0] >= C_SIDE/DOT_SIZE || x[0] >= C_SIDE/DOT_SIZE || x[0] < 0 || y[0] < 0) {	
+				return true;
+			}
+			
+			return false;
+		}
+		
+		//End 
+		
+		
+
+		let canvas = $('#gameCanvas');
+		let c = canvas[0].getContext('2d');
+
+		//change these constants according to your ease
+		const C_SIDE = board;
+		const DOT_SIZE = pixel;
+		
+		
+		canvas.attr("height", C_SIDE);
+		canvas.attr("width", C_SIDE);
+		
+		const ALL_DOTS = (C_SIDE * C_SIDE)/(DOT_SIZE*DOT_SIZE);
+		const MAX_RAND = C_SIDE/10 - 1;
+		
+		const LEFT_KEY = 37;
+		const RIGHT_KEY = 39;
+		const UP_KEY = 38;
+		const DOWN_KEY = 40;
+		
+		var x = new Array(ALL_DOTS);
+		var y = new Array(ALL_DOTS);
+		
+		
+		var leftDirection = false;
+		var rightDirection = true;
+		var upDirection = false;
+		var downDirection = false;
+		
+		var score=0;
+		
+		
+		//initializing snake
+
+		var DELAY = delay;
+		function init()
+		{
+			
+			canvas.css('background-color', 'blue');
+			DELAY = delay;
+			new_fruit();
+			snake_size = 3;
+			level = 1;
+			score = 0;
+			for (var z = 0; z < snake_size; z++) {
+				x[z] = Math.floor(MAX_RAND/2) - z;
+				y[z] = Math.floor(MAX_RAND/2);
+			}
+			var leftDirection = false;
+			var rightDirection = true;
+			var upDirection = false;
+			var downDirection = false;
+		}
+		
+		var changelevel = true;
+		
+		
+		init();	
+		setInterval(function(){
+			c.clearRect(0, 0, C_SIDE, C_SIDE);
+			snakey(snake_size);
+			controls(snake_size);
+			fixed_fruitey(fruit_x, fruit_y);
+			if(got_Fruit(fruit_x, fruit_y, snake_size))
+			{
+				snake_size++;
+				score++;
+				new_fruit(snake_size);
+			}
+			
+			if(checkCollision(snake_size))
+			{
+				canvas.css('background-color', 'red');
+				alert('Game-Over');
+				init();
+			}
+			
+			
+			if(score%5==0 && score!=0 && changelevel){
+				level++;
+				DELAY = DELAY - (level * 20);
+				changelevel = false;
+			}
+			if(score%5!= 0 && !changelevel)
+			{
+				changelevel = true;
+			}
+			
+
+			$('#score').html(score);
+			$('#level').html(level);
+		}, DELAY);
+	}
+	
+	$('#make').on('click', function(){
+		snakeAPI($("#delay").val(),$("#pixel").val(),$("#board").val());
+	});
+	
+	</script>
+
+  </body>
+</html>
