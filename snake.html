@@ -187,11 +187,6 @@
 		var y = new Array(ALL_DOTS);
 		
 		
-		var leftDirection = false;
-		var rightDirection = true;
-		var upDirection = false;
-		var downDirection = false;
-		
 		var score=0;
 		
 		
@@ -211,18 +206,25 @@
 				x[z] = Math.floor(MAX_RAND/2) - z;
 				y[z] = Math.floor(MAX_RAND/2);
 			}
-			var leftDirection = false;
-			var rightDirection = true;
-			var upDirection = false;
-			var downDirection = false;
+			leftDirection = false;
+			rightDirection = true;
+			upDirection = false;
+			downDirection = false;
 		}
 		
 		var changelevel = true;
 		
 		
 		init();	
-		setInterval(function(){
+		setTimeout(f = function(){
 			c.clearRect(0, 0, C_SIDE, C_SIDE);
+			if(checkCollision(snake_size))
+			{
+				canvas.css('background-color', 'red');
+				init();
+				alert('Game-Over');
+			}
+			
 			snakey(snake_size);
 			controls(snake_size);
 			fixed_fruitey(fruit_x, fruit_y);
@@ -233,17 +235,12 @@
 				new_fruit(snake_size);
 			}
 			
-			if(checkCollision(snake_size))
-			{
-				canvas.css('background-color', 'red');
-				alert('Game-Over');
-				init();
-			}
+			
 			
 			
 			if(score%5==0 && score!=0 && changelevel){
 				level++;
-				DELAY = DELAY - (level * 20);
+				DELAY = DELAY - (level * 5);
 				changelevel = false;
 			}
 			if(score%5!= 0 && !changelevel)
@@ -254,6 +251,8 @@
 
 			$('#score').html(score);
 			$('#level').html(level);
+			setTimeout(f, DELAY);
+		
 		}, DELAY);
 	}
 	
